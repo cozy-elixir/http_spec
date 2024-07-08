@@ -1,21 +1,26 @@
 # HTTPSpec
 
-**TODO: Add description**
+[![CI](https://github.com/cozy-elixir/http_spec/actions/workflows/ci.yml/badge.svg)](https://github.com/cozy-elixir/http_spec/actions/workflows/ci.yml)
+[![Hex.pm](https://img.shields.io/hexpm/v/http_spec.svg)](https://hex.pm/packages/http_spec)
+
+Provides implementation-independent HTTP-related structs.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `http_spec` to your list of dependencies in `mix.exs`:
+Add `:http_spec` to the list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:http_spec, "~> 0.1.0"}
+    {:http_spec, <requirement>}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/http_spec>.
+## Usage
 
+For more information, see the [documentation](https://hexdocs.pm/http_spec).
+
+## License
+
+[Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)

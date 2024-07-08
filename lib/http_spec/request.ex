@@ -45,7 +45,7 @@ defmodule HTTPSpec.Request do
                   required: true
                 ],
                 port: [
-                  type: {:in, 0..65535},
+                  type: {:in, 0..65_535},
                   required: true
                 ],
                 method: [
