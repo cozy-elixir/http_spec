@@ -21,6 +21,11 @@ end
 
 For more information, see the [documentation](https://hexdocs.pm/http_spec).
 
+## Thanks
+
+- [wojtekmach/req](https://github.com/wojtekmach/req)
+- [inets/httpc from Erlang](https://www.erlang.org/doc/apps/inets/httpc)
+
 ## License
 
 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
