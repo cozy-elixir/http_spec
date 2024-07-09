@@ -54,7 +54,7 @@ defmodule HTTPSpec.Request do
                 ],
                 path: [
                   type: :string,
-                  required: true
+                  default: "/"
                 ],
                 headers: [
                   type: {:list, {:tuple, [:string, :string]}},
