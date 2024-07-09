@@ -68,4 +68,23 @@ defmodule HTTPSpec.Response do
         raise exception
     end
   end
+
+  @doc """
+  Returns the values of the header specified by `name`.
+
+  ## Examples
+
+      iex> Response.get_header(response, "content-type")
+      ["application/json"]
+
+      iex> Response.get_header(response, "x-unknown")
+      []
+
+  """
+  @spec get_header(t(), binary()) :: [binary()]
+  def get_header(%__MODULE__{} = response, name) when is_binary(name) do
+    for {^name, value} <- response.headers do
+      value
+    end
+  end
 end

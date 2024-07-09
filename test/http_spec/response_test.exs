@@ -1,16 +1,18 @@
 defmodule HTTPSpec.ResponseTest do
   use ExUnit.Case
 
+  alias HTTPSpec.Response
+
   describe "build/1" do
     test "returns {:ok, struct} when options are valid" do
       assert {:ok,
-              %HTTPSpec.Response{
+              %Response{
                 status: 200,
                 body: nil,
                 headers: [{"header-a", "value-a"}],
                 trailers: [{"header-b", "value-b"}]
               }} =
-               HTTPSpec.Response.build(
+               Response.build(
                  status: 200,
                  body: nil,
                  headers: [{"header-a", "value-a"}],
@@ -25,19 +27,19 @@ defmodule HTTPSpec.ResponseTest do
                 key: :status,
                 value: nil,
                 keys_path: []
-              }} = HTTPSpec.Response.build([])
+              }} = Response.build([])
     end
   end
 
   describe "build!/1" do
     test "returns a struct when options are valid" do
-      assert %HTTPSpec.Response{
+      assert %Response{
                status: 200,
                body: nil,
                headers: [{"header-a", "value-a"}],
                trailers: [{"header-b", "value-b"}]
              } =
-               HTTPSpec.Response.build!(
+               Response.build!(
                  status: 200,
                  body: nil,
                  headers: [{"header-a", "value-a"}],
@@ -47,8 +49,26 @@ defmodule HTTPSpec.ResponseTest do
 
     test "raise an exception when options are invalid" do
       assert_raise HTTPSpec.ArgumentError, fn ->
-        HTTPSpec.Response.build!([])
+        Response.build!([])
       end
+    end
+  end
+
+  describe "operate on headers" do
+    setup do
+      response =
+        Response.build!(
+          status: 200,
+          headers: [{"content-type", "application/json"}],
+          body: "hello"
+        )
+
+      %{response: response}
+    end
+
+    test "get_header/2", %{response: response} do
+      assert ["application/json"] = Response.get_header(response, "content-type")
+      assert [] = Response.get_header(response, "x-unknown")
     end
   end
 end
