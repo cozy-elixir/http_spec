@@ -40,9 +40,9 @@ defmodule HTTPSpec.Response do
                 ]
               )
 
-  @spec build(keyword() | map()) ::
+  @spec new(keyword() | map()) ::
           {:ok, __MODULE__.t()} | {:error, HTTPSpec.ArgumentError.t()}
-  def build(options) do
+  def new(options) do
     case NimbleOptions.validate(options, @definition) do
       {:ok, validated_options} ->
         {:ok, struct(__MODULE__, validated_options)}
@@ -58,9 +58,9 @@ defmodule HTTPSpec.Response do
     end
   end
 
-  @spec build!(keyword() | map()) :: __MODULE__.t()
-  def build!(options) do
-    case build(options) do
+  @spec new!(keyword() | map()) :: __MODULE__.t()
+  def new!(options) do
+    case new(options) do
       {:ok, struct} ->
         struct
 

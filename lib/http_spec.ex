@@ -23,13 +23,13 @@ defmodule HTTPSpec do
 
   Build a request struct:
 
-      HTTPSpec.Request.build(options)
-      HTTPSpec.Request.build!(options)
+      HTTPSpec.Request.new(options)
+      HTTPSpec.Request.new!(options)
 
   Build a response struct:
 
-      HTTPSpec.Response.build(options)
-      HTTPSpec.Response.build!(options)
+      HTTPSpec.Response.new(options)
+      HTTPSpec.Response.new!(options)
 
   """
 end

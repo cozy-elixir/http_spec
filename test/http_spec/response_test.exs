@@ -12,7 +12,7 @@ defmodule HTTPSpec.ResponseTest do
                 headers: [{"header-a", "value-a"}],
                 trailers: [{"header-b", "value-b"}]
               }} =
-               Response.build(
+               Response.new(
                  status: 200,
                  body: nil,
                  headers: [{"header-a", "value-a"}],
@@ -27,7 +27,7 @@ defmodule HTTPSpec.ResponseTest do
                 key: :status,
                 value: nil,
                 keys_path: []
-              }} = Response.build([])
+              }} = Response.new([])
     end
   end
 
@@ -39,7 +39,7 @@ defmodule HTTPSpec.ResponseTest do
                headers: [{"header-a", "value-a"}],
                trailers: [{"header-b", "value-b"}]
              } =
-               Response.build!(
+               Response.new!(
                  status: 200,
                  body: nil,
                  headers: [{"header-a", "value-a"}],
@@ -49,7 +49,7 @@ defmodule HTTPSpec.ResponseTest do
 
     test "raise an exception when options are invalid" do
       assert_raise HTTPSpec.ArgumentError, fn ->
-        Response.build!([])
+        Response.new!([])
       end
     end
   end
@@ -57,7 +57,7 @@ defmodule HTTPSpec.ResponseTest do
   describe "operate on headers" do
     setup do
       response =
-        Response.build!(
+        Response.new!(
           status: 200,
           headers: [{"content-type", "application/json"}],
           body: "hello"

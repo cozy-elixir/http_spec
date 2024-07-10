@@ -16,7 +16,7 @@ defmodule HTTPSpec.RequestTest do
                 body: "",
                 query: "key=value"
               }} =
-               Request.build(
+               Request.new(
                  scheme: :https,
                  host: "www.example.com",
                  port: 443,
@@ -35,7 +35,7 @@ defmodule HTTPSpec.RequestTest do
                 key: :method,
                 value: nil,
                 keys_path: []
-              }} = Request.build([])
+              }} = Request.new([])
     end
   end
 
@@ -51,7 +51,7 @@ defmodule HTTPSpec.RequestTest do
                body: "",
                query: "key=value"
              } =
-               Request.build!(
+               Request.new!(
                  scheme: :https,
                  host: "www.example.com",
                  port: 443,
@@ -65,7 +65,7 @@ defmodule HTTPSpec.RequestTest do
 
     test "raise an exception when options are invalid" do
       assert_raise HTTPSpec.ArgumentError, fn ->
-        Request.build!([])
+        Request.new!([])
       end
     end
   end
@@ -73,7 +73,7 @@ defmodule HTTPSpec.RequestTest do
   describe "operate on headers" do
     setup do
       request =
-        Request.build!(
+        Request.new!(
           scheme: :https,
           host: "www.example.com",
           port: 443,
