@@ -45,8 +45,8 @@ defmodule HTTPSpec.Request do
                   required: true
                 ],
                 path: [
-                  type: :string,
-                  default: "/"
+                  type: {:or, [:string, nil]},
+                  default: nil
                 ],
                 query: [
                   type: {:or, [:string, nil]},
