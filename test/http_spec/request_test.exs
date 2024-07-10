@@ -3,7 +3,7 @@ defmodule HTTPSpec.RequestTest do
 
   alias HTTPSpec.Request
 
-  describe "build/1" do
+  describe "new/1" do
     test "returns {:ok, struct} when options are valid" do
       assert {:ok,
               %Request{
@@ -39,7 +39,7 @@ defmodule HTTPSpec.RequestTest do
     end
   end
 
-  describe "build!/1" do
+  describe "new!/1" do
     test "returns a struct when options are valid" do
       assert %Request{
                scheme: :https,
@@ -72,18 +72,7 @@ defmodule HTTPSpec.RequestTest do
 
   describe "operate on headers" do
     setup do
-      request =
-        Request.new!(
-          scheme: :https,
-          host: "www.example.com",
-          port: 443,
-          method: "POST",
-          path: "/",
-          headers: [{"accept", "application/json"}],
-          body: "",
-          query: "key=value"
-        )
-
+      request = build_request()
       %{request: request}
     end
 
@@ -120,5 +109,53 @@ defmodule HTTPSpec.RequestTest do
       request = Request.delete_header(request, "accept")
       assert request.headers == []
     end
+  end
+
+  describe "build_method/1" do
+    test "works for atom" do
+      request = build_request(method: :post)
+      assert "POST" == Request.build_method(request)
+    end
+
+    test "works for string" do
+      request = build_request(method: "POST")
+      assert "POST" == Request.build_method(request)
+    end
+  end
+
+  describe "build_url/1" do
+    test "works" do
+      # a requset for accessing a given position of an image
+      request =
+        build_request(
+          method: :get,
+          scheme: :https,
+          host: "www.example.com",
+          port: 443,
+          path: "/image.png",
+          query: "size=lg",
+          fragment: "124,28"
+        )
+
+      assert "https://www.example.com/image.png?size=lg#124,28" ==
+               Request.build_url(request)
+    end
+  end
+
+  defp build_request(overrides \\ []) do
+    default = [
+      method: :post,
+      scheme: :https,
+      host: "www.example.com",
+      port: 443,
+      path: "/",
+      query: "key=value",
+      headers: [{"accept", "application/json"}],
+      body: ""
+    ]
+
+    default
+    |> Keyword.merge(overrides)
+    |> Request.new!()
   end
 end

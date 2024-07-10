@@ -3,7 +3,7 @@ defmodule HTTPSpec.ResponseTest do
 
   alias HTTPSpec.Response
 
-  describe "build/1" do
+  describe "new/1" do
     test "returns {:ok, struct} when options are valid" do
       assert {:ok,
               %Response{
@@ -31,7 +31,7 @@ defmodule HTTPSpec.ResponseTest do
     end
   end
 
-  describe "build!/1" do
+  describe "new!/1" do
     test "returns a struct when options are valid" do
       assert %Response{
                status: 200,

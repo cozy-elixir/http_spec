@@ -189,4 +189,54 @@ defmodule HTTPSpec.Request do
   defp ensure_header_downcase(name) do
     String.downcase(name, :ascii)
   end
+
+  @doc """
+  Builds a method.
+
+  ## Examples
+
+      iex> request = Request.new!([method: :post, ...])
+      iex> Request.build_method(request)
+      "POST"
+
+      iex> request = Request.new!(method: "POST", ...)
+      iex> Request.build_method(request)
+      "POST"
+
+  """
+  @spec build_method(t()) :: String.t()
+  def build_method(%__MODULE__{} = request) do
+    request.method |> to_string() |> String.upcase()
+  end
+
+  @doc """
+  Builds an URL.
+
+  ## Examples
+
+      iex> request = Request.new!(
+      ...>   method: :get
+      ...>   scheme: :https,
+      ...>   host: "www.example.com",
+      ...>   port: 443,
+      ...>   path: "/image.png",
+      ...>   query: "size=lg",
+      ...>   fragment: "124,28"
+      ...> )
+      iex> Request.build_url(request)
+      "https://www.example.com/image.png?size=lg#124,28"
+
+  """
+  @spec build_url(t()) :: String.t()
+  def build_url(%__MODULE__{} = request) do
+    %URI{
+      scheme: to_string(request.scheme),
+      host: request.host,
+      port: request.port,
+      path: request.path,
+      query: request.query,
+      fragment: request.fragment
+    }
+    |> URI.to_string()
+  end
 end
