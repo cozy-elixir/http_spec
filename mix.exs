@@ -1,9 +1,10 @@
 defmodule HTTPSpec.MixProject do
   use Mix.Project
 
-  @version "1.2.0"
+  @version "2.0.0"
   @description "Provides implementation-independent HTTP-related structs."
   @source_url "https://github.com/cozy-elixir/http_spec"
+  @changelog_url "https://github.com/cozy-elixir/http_spec/blob/v#{@version}/CHANGELOG.md"
 
   def project do
     [
@@ -42,7 +43,7 @@ defmodule HTTPSpec.MixProject do
 
   defp docs do
     [
-      extras: ["README.md"],
+      extras: ["README.md", "CHANGELOG.md"],
       source_url: @source_url,
       source_ref: "v#{@version}"
     ]
@@ -51,7 +52,10 @@ defmodule HTTPSpec.MixProject do
   defp package do
     [
       licenses: ["Apache-2.0"],
-      links: %{GitHub: @source_url}
+      links: %{
+        GitHub: @source_url,
+        Changelog: @changelog_url
+      }
     ]
   end
 
