@@ -152,9 +152,9 @@ defmodule HTTPSpec.Request do
 
       iex> request =
       ...>   request
-      ...>   |> Req.Request.put_new_header("accept", "application/json")
-      ...>   |> Req.Request.put_new_header("accept", "text/html")
-      iex> Req.Request.get_header(request, "accept")
+      ...>   |> Request.put_new_header("accept", "application/json")
+      ...>   |> Request.put_new_header("accept", "text/html")
+      iex> Request.get_header(request, "accept")
       ["application/json"]
 
   """
@@ -176,7 +176,7 @@ defmodule HTTPSpec.Request do
       iex> Request.get_header(request, "cache-control")
       ["max-age=600", "no-transform"]
       iex> request = Request.delete_header(req, "cache-control")
-      iex> Req.Request.get_header(request, "cache-control")
+      iex> Request.get_header(request, "cache-control")
       []
 
   """
