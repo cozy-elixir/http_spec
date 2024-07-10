@@ -31,8 +31,8 @@ defmodule HTTPSpec.RequestTest do
     test "returns {:error, exception} when options are invalid" do
       assert {:error,
               %HTTPSpec.ArgumentError{
-                message: "required :scheme option not found, received options: []",
-                key: :scheme,
+                message: "required :method option not found, received options: []",
+                key: :method,
                 value: nil,
                 keys_path: []
               }} = Request.build([])

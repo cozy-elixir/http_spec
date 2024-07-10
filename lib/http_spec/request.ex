@@ -3,39 +3,35 @@ defmodule HTTPSpec.Request do
   A struct for describing HTTP request.
   """
 
-  @enforce_keys [:scheme, :host, :port, :method, :path, :headers, :body, :query]
+  @enforce_keys [:method, :scheme, :host, :port, :path, :query, :fragment, :headers, :body]
+  defstruct @enforce_keys
 
-  defstruct [
-    :scheme,
-    :host,
-    :port,
-    :method,
-    :path,
-    :headers,
-    :body,
-    :query
-  ]
-
+  @type method :: atom() | String.t()
   @type scheme :: :http | :https
   @type host :: String.t()
-  @type method :: atom() | String.t()
   @type path :: String.t()
+  @type query :: String.t() | nil
+  @type fragment :: String.t() | nil
   @type headers :: [{header_name :: String.t(), header_value :: String.t()}]
   @type body :: iodata() | nil
-  @type query :: String.t() | nil
 
   @type t :: %__MODULE__{
+          method: method(),
           scheme: scheme(),
           host: host(),
           port: :inet.port_number(),
-          method: method(),
           path: path(),
+          query: query(),
+          fragment: fragment(),
           headers: headers(),
-          body: body(),
-          query: query()
+          body: body()
         }
 
   @definition NimbleOptions.new!(
+                method: [
+                  type: {:or, [:atom, :string]},
+                  required: true
+                ],
                 scheme: [
                   type: {:in, [:http, :https]},
                   required: true
@@ -48,13 +44,17 @@ defmodule HTTPSpec.Request do
                   type: {:in, 0..65_535},
                   required: true
                 ],
-                method: [
-                  type: {:or, [:atom, :string]},
-                  required: true
-                ],
                 path: [
                   type: :string,
                   default: "/"
+                ],
+                query: [
+                  type: {:or, [:string, nil]},
+                  default: nil
+                ],
+                fragment: [
+                  type: {:or, [:string, nil]},
+                  default: nil
                 ],
                 headers: [
                   type: {:list, {:tuple, [:string, :string]}},
@@ -62,10 +62,6 @@ defmodule HTTPSpec.Request do
                 ],
                 body: [
                   type: {:or, [{:list, :any}, :string, nil]},
-                  default: nil
-                ],
-                query: [
-                  type: {:or, [:string, nil]},
                   default: nil
                 ]
               )
