@@ -15,7 +15,7 @@ defmodule HTTPSpec.ResponseTest do
                Response.new(
                  status: 200,
                  body: nil,
-                 headers: [{"header-a", "value-a"}],
+                 headers: [{"Header-a", "value-a"}],
                  trailers: [{"header-b", "value-b"}]
                )
     end
@@ -42,7 +42,7 @@ defmodule HTTPSpec.ResponseTest do
                Response.new!(
                  status: 200,
                  body: nil,
-                 headers: [{"header-a", "value-a"}],
+                 headers: [{"Header-a", "value-a"}],
                  trailers: [{"header-b", "value-b"}]
                )
     end
@@ -57,10 +57,9 @@ defmodule HTTPSpec.ResponseTest do
   describe "operate on headers" do
     setup do
       response =
-        Response.new!(
-          status: 200,
-          headers: [{"content-type", "application/json"}],
-          body: "hello"
+        build_response(
+          headers: [{"content-type", "application/json"}, {"trailer", "expires"}],
+          trailers: [{"expires", "Wed, 21 Oct 2015 07:28:00 GMT"}]
         )
 
       %{response: response}
@@ -70,5 +69,22 @@ defmodule HTTPSpec.ResponseTest do
       assert ["application/json"] = Response.get_header(response, "content-type")
       assert [] = Response.get_header(response, "x-unknown")
     end
+
+    test "get_trailer/2", %{response: response} do
+      assert ["Wed, 21 Oct 2015 07:28:00 GMT"] = Response.get_trailer(response, "expires")
+      assert [] = Response.get_trailer(response, "x-unknown")
+    end
+  end
+
+  defp build_response(overrides) do
+    default = [
+      status: 200,
+      headers: [],
+      body: nil
+    ]
+
+    default
+    |> Keyword.merge(overrides)
+    |> Response.new!()
   end
 end

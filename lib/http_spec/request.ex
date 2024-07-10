@@ -186,10 +186,6 @@ defmodule HTTPSpec.Request do
     %{request | headers: List.keydelete(request.headers, name, 0)}
   end
 
-  defp ensure_header_downcase(name) do
-    String.downcase(name, :ascii)
-  end
-
   @doc """
   Builds a method.
 
@@ -238,5 +234,9 @@ defmodule HTTPSpec.Request do
       fragment: request.fragment
     }
     |> URI.to_string()
+  end
+
+  defp ensure_header_downcase(name) do
+    String.downcase(name, :ascii)
   end
 end

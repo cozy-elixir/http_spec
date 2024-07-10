@@ -45,7 +45,14 @@ defmodule HTTPSpec.Response do
   def new(options) do
     case NimbleOptions.validate(options, @definition) do
       {:ok, validated_options} ->
-        {:ok, struct(__MODULE__, validated_options)}
+        struct =
+          validated_options
+          |> Keyword.update!(:headers, fn headers ->
+            for({name, value} <- headers, do: {ensure_header_downcase(name), value})
+          end)
+          |> then(&struct(__MODULE__, &1))
+
+        {:ok, struct}
 
       {:error, %NimbleOptions.ValidationError{} = error} ->
         {:error,
@@ -86,5 +93,28 @@ defmodule HTTPSpec.Response do
     for {^name, value} <- response.headers do
       value
     end
+  end
+
+  @doc """
+  Returns the values of the trailer specified by `name`.
+
+  ## Examples
+
+      iex> Response.get_trailer(response, "expires")
+      ["Wed, 21 Oct 2015 07:28:00 GMT"]
+
+      iex> Response.get_trailer(response, "x-unknown")
+      []
+
+  """
+  @spec get_trailer(t(), binary()) :: [binary()]
+  def get_trailer(%__MODULE__{} = response, name) when is_binary(name) do
+    for {^name, value} <- response.trailers do
+      value
+    end
+  end
+
+  defp ensure_header_downcase(name) do
+    String.downcase(name, :ascii)
   end
 end
