@@ -5,10 +5,13 @@ defmodule HTTPSpec do
   ## Why?
 
   Almost every HTTP client has its own abstractions for request and response.
-
   These abstractions are enough when solving problems with a particular HTTP
   client. But, when you are building a package involving HTTP and do not want
   to be tied to a specific HTTP client, these abstractions become limiting.
+
+  HTTP clients come and go, but HTTP standards endure forever. It's better to
+  build around something that is almost unchanging, rather than something
+  that frequently changes.
 
   This package try to provide implementation-independent HTTP-related structs.
   With these structs, you can build things involving HTTP, but no actual HTTP
@@ -31,5 +34,6 @@ defmodule HTTPSpec do
       HTTPSpec.Response.new(options)
       HTTPSpec.Response.new!(options)
 
+  Check out their docs for more available functionalities.
   """
 end
