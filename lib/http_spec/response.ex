@@ -42,12 +42,12 @@ defmodule HTTPSpec.Response do
 
   @spec new(keyword() | map()) ::
           {:ok, __MODULE__.t()} | {:error, HTTPSpec.ArgumentError.t()}
-  def new(options) do
+  def new(options) when is_list(options) or is_map(options) do
     case NimbleOptions.validate(options, @definition) do
       {:ok, validated_options} ->
         struct =
           validated_options
-          |> Keyword.update!(:headers, fn headers ->
+          |> update_in([:headers], fn headers ->
             for({name, value} <- headers, do: {ensure_header_downcase(name), value})
           end)
           |> then(&struct(__MODULE__, &1))
@@ -66,7 +66,7 @@ defmodule HTTPSpec.Response do
   end
 
   @spec new!(keyword() | map()) :: __MODULE__.t()
-  def new!(options) do
+  def new!(options) when is_list(options) or is_map(options) do
     case new(options) do
       {:ok, struct} ->
         struct

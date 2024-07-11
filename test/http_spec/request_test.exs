@@ -26,6 +26,28 @@ defmodule HTTPSpec.RequestTest do
                  body: "",
                  query: "key=value"
                )
+
+      assert {:ok,
+              %Request{
+                scheme: :https,
+                host: "www.example.com",
+                port: 443,
+                method: "POST",
+                path: "/",
+                headers: [{"accept", "*/*"}],
+                body: "",
+                query: "key=value"
+              }} =
+               Request.new(%{
+                 scheme: :https,
+                 host: "www.example.com",
+                 port: 443,
+                 method: "POST",
+                 path: "/",
+                 headers: [{"Accept", "*/*"}],
+                 body: "",
+                 query: "key=value"
+               })
     end
 
     test "returns {:error, exception} when options are invalid" do

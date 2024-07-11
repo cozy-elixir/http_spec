@@ -18,6 +18,20 @@ defmodule HTTPSpec.ResponseTest do
                  headers: [{"Header-a", "value-a"}],
                  trailers: [{"header-b", "value-b"}]
                )
+
+      assert {:ok,
+              %Response{
+                status: 200,
+                body: nil,
+                headers: [{"header-a", "value-a"}],
+                trailers: [{"header-b", "value-b"}]
+              }} =
+               Response.new(%{
+                 status: 200,
+                 body: nil,
+                 headers: [{"Header-a", "value-a"}],
+                 trailers: [{"header-b", "value-b"}]
+               })
     end
 
     test "returns {:error, exception} when options are invalid" do
