@@ -16,8 +16,8 @@ defmodule HTTPSpec.Response do
 
   @type t :: %__MODULE__{
           status: status(),
-          body: body(),
           headers: headers(),
+          body: body(),
           trailers: headers()
         }
 
@@ -26,13 +26,13 @@ defmodule HTTPSpec.Response do
                   type: {:in, 200..599},
                   required: true
                 ],
-                body: [
-                  type: {:or, [:string, nil]},
-                  default: nil
-                ],
                 headers: [
                   type: {:list, {:tuple, [:string, :string]}},
                   default: []
+                ],
+                body: [
+                  type: {:or, [:string, nil]},
+                  default: nil
                 ],
                 trailers: [
                   type: {:list, {:tuple, [:string, :string]}},
@@ -40,6 +40,22 @@ defmodule HTTPSpec.Response do
                 ]
               )
 
+  @doc """
+  Creates a response from given options.
+
+  The options can be provided as a keyword list or a map.
+
+  ## Examples
+
+      HTTPSpec.Response.new(%{
+        status: 200,
+        headers: [
+          {"content-type", "text/html"}
+        ],
+        body: "<html>...</html>"
+      })
+
+  """
   @spec new(keyword() | map()) ::
           {:ok, __MODULE__.t()} | {:error, HTTPSpec.ArgumentError.t()}
   def new(options) when is_list(options) or is_map(options) do
@@ -65,6 +81,9 @@ defmodule HTTPSpec.Response do
     end
   end
 
+  @doc """
+  Bang version of `new/1`.
+  """
   @spec new!(keyword() | map()) :: __MODULE__.t()
   def new!(options) when is_list(options) or is_map(options) do
     case new(options) do
@@ -81,10 +100,10 @@ defmodule HTTPSpec.Response do
 
   ## Examples
 
-      iex> Response.get_header(response, "content-type")
+      iex> HTTPSpec.Response.get_header(response, "content-type")
       ["application/json"]
 
-      iex> Response.get_header(response, "x-unknown")
+      iex> HTTPSpec.Response.get_header(response, "x-unknown")
       []
 
   """
@@ -100,10 +119,10 @@ defmodule HTTPSpec.Response do
 
   ## Examples
 
-      iex> Response.get_trailer(response, "expires")
+      iex> HTTPSpec.Response.get_trailer(response, "expires")
       ["Wed, 21 Oct 2015 07:28:00 GMT"]
 
-      iex> Response.get_trailer(response, "x-unknown")
+      iex> HTTPSpec.Response.get_trailer(response, "x-unknown")
       []
 
   """

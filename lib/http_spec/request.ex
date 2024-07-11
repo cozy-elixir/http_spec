@@ -66,6 +66,28 @@ defmodule HTTPSpec.Request do
                 ]
               )
 
+  @doc """
+  Creates a request from given options.
+
+  The options can be provided as a keyword list or a map.
+
+  ## Examples
+
+      HTTPSpec.Request.new(%{
+        method: :post,
+        scheme: :https,
+        host: "www.example.com",
+        port: 443,
+        path: "/talk",
+        headers: [
+          {"content-type", "application/x-www-form-urlencoded"},
+          {"accept", "text/html"}
+        ],
+        body: "say=Hi&to=Mom",
+        query: "tone=cute"
+      })
+
+  """
   @spec new(keyword() | map()) ::
           {:ok, __MODULE__.t()} | {:error, HTTPSpec.ArgumentError.t()}
   def new(options) when is_list(options) or is_map(options) do
@@ -91,6 +113,9 @@ defmodule HTTPSpec.Request do
     end
   end
 
+  @doc """
+  Bang version of `new/1`.
+  """
   @spec new!(keyword() | map()) :: __MODULE__.t()
   def new!(options) when is_list(options) or is_map(options) do
     case new(options) do
@@ -107,9 +132,9 @@ defmodule HTTPSpec.Request do
 
   ## Examples
 
-      iex> Request.get_header(request, "accept")
+      iex> HTTPSpec.Request.get_header(request, "accept")
       ["application/json"]
-      iex> Request.get_header(requset, "x-unknown")
+      iex> HTTPSpec.Request.get_header(requset, "x-unknown")
       []
 
   """
@@ -129,10 +154,10 @@ defmodule HTTPSpec.Request do
 
   ## Examples
 
-      iex> Request.get_header(request, "accept")
+      iex> HTTPSpec.Request.get_header(request, "accept")
       []
       iex> request = Request.put_header(request, "accept", "application/json")
-      iex> Request.get_header(request, "accept")
+      iex> HTTPSpec.Request.get_header(request, "accept")
       ["application/json"]
 
   """
@@ -152,9 +177,9 @@ defmodule HTTPSpec.Request do
 
       iex> request =
       ...>   request
-      ...>   |> Request.put_new_header("accept", "application/json")
-      ...>   |> Request.put_new_header("accept", "text/html")
-      iex> Request.get_header(request, "accept")
+      ...>   |> HTTPSpec.Request.put_new_header("accept", "application/json")
+      ...>   |> HTTPSpec.Request.put_new_header("accept", "text/html")
+      iex> HTTPSpec.Request.get_header(request, "accept")
       ["application/json"]
 
   """
@@ -173,10 +198,10 @@ defmodule HTTPSpec.Request do
 
   ## Examples
 
-      iex> Request.get_header(request, "cache-control")
+      iex> HTTPSpec.Request.get_header(request, "cache-control")
       ["max-age=600", "no-transform"]
       iex> request = Request.delete_header(req, "cache-control")
-      iex> Request.get_header(request, "cache-control")
+      iex> HTTPSpec.Request.get_header(request, "cache-control")
       []
 
   """
@@ -191,12 +216,12 @@ defmodule HTTPSpec.Request do
 
   ## Examples
 
-      iex> request = Request.new!([method: :post, ...])
-      iex> Request.build_method(request)
+      iex> request = HTTPSpec.Request.new!([method: :post, ...])
+      iex> HTTPSpec.Request.build_method(request)
       "POST"
 
-      iex> request = Request.new!(method: "POST", ...)
-      iex> Request.build_method(request)
+      iex> request = HTTPSpec.Request.new!(method: "POST", ...)
+      iex> HTTPSpec.Request.build_method(request)
       "POST"
 
   """
@@ -210,7 +235,7 @@ defmodule HTTPSpec.Request do
 
   ## Examples
 
-      iex> request = Request.new!(
+      iex> request = HTTPSpec.Request.new!(
       ...>   method: :get
       ...>   scheme: :https,
       ...>   host: "www.example.com",
@@ -219,7 +244,7 @@ defmodule HTTPSpec.Request do
       ...>   query: "size=lg",
       ...>   fragment: "124,28"
       ...> )
-      iex> Request.build_url(request)
+      iex> HTTPSpec.Request.build_url(request)
       "https://www.example.com/image.png?size=lg#124,28"
 
   """
