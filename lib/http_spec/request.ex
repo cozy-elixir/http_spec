@@ -88,8 +88,7 @@ defmodule HTTPSpec.Request do
       })
 
   """
-  @spec new(keyword() | map()) ::
-          {:ok, __MODULE__.t()} | {:error, HTTPSpec.ArgumentError.t()}
+  @spec new(keyword() | map()) :: {:ok, t()} | {:error, HTTPSpec.ArgumentError.t()}
   def new(options) when is_list(options) or is_map(options) do
     case NimbleOptions.validate(options, @definition) do
       {:ok, validated_options} ->
@@ -116,7 +115,7 @@ defmodule HTTPSpec.Request do
   @doc """
   Bang version of `new/1`.
   """
-  @spec new!(keyword() | map()) :: __MODULE__.t()
+  @spec new!(keyword() | map()) :: t()
   def new!(options) when is_list(options) or is_map(options) do
     case new(options) do
       {:ok, struct} ->
@@ -184,10 +183,39 @@ defmodule HTTPSpec.Request do
 
   """
   @spec put_new_header(t(), binary(), binary()) :: t()
-  def put_new_header(%__MODULE__{} = request, name, value) do
+  def put_new_header(%__MODULE__{} = request, name, value)
+      when is_binary(name) and is_binary(value) do
     case get_header(request, name) do
       [] -> put_header(request, name, value)
       _ -> request
+    end
+  end
+
+  @doc """
+  Lazy version of `put_new_header/3`.
+  """
+  @spec put_new_lazy_header(t(), binary(), (-> binary()) | (t() -> binary())) :: t()
+  def put_new_lazy_header(%__MODULE__{} = request, name, fun)
+      when is_binary(name) and is_function(fun, 0) do
+    case get_header(request, name) do
+      [] ->
+        value = apply(fun, [])
+        put_header(request, name, value)
+
+      _ ->
+        request
+    end
+  end
+
+  def put_new_lazy_header(%__MODULE__{} = request, name, fun)
+      when is_binary(name) and is_function(fun, 1) do
+    case get_header(request, name) do
+      [] ->
+        value = apply(fun, [request])
+        put_header(request, name, value)
+
+      _ ->
+        request
     end
   end
 
@@ -209,6 +237,24 @@ defmodule HTTPSpec.Request do
   def delete_header(%__MODULE__{} = request, name) when is_binary(name) do
     name = ensure_header_downcase(name)
     %{request | headers: List.keydelete(request.headers, name, 0)}
+  end
+
+  @doc """
+  Puts body into request.
+  """
+  @spec put_body(t(), body()) :: t()
+  def put_body(%__MODULE__{} = request, body)
+      when is_list(body) or is_binary(body) or is_nil(body) do
+    %{request | body: body}
+  end
+
+  @doc """
+  Puts query into request.
+  """
+  @spec put_query(t(), query()) :: t()
+  def put_query(%__MODULE__{} = request, query)
+      when is_binary(query) or is_nil(query) do
+    %{request | query: query}
   end
 
   @doc """

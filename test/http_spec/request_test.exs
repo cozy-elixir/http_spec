@@ -92,6 +92,28 @@ defmodule HTTPSpec.RequestTest do
     end
   end
 
+  describe "operate on query" do
+    setup do
+      request = build_request()
+      %{request: request}
+    end
+
+    test "put_query/2", %{request: request} do
+      assert %Request{query: "querystring"} = Request.put_query(request, "querystring")
+    end
+  end
+
+  describe "operate on body" do
+    setup do
+      request = build_request()
+      %{request: request}
+    end
+
+    test "put_body", %{request: request} do
+      assert %Request{body: "raw"} = Request.put_body(request, "raw")
+    end
+  end
+
   describe "operate on headers" do
     setup do
       request = build_request()
@@ -114,16 +136,41 @@ defmodule HTTPSpec.RequestTest do
 
     test "put_new_header/3", %{request: request} do
       request1 = Request.put_new_header(request, "accept", "text/html")
-
-      assert request1.headers == [
-               {"accept", "application/json"}
-             ]
+      assert request1.headers == [{"accept", "application/json"}]
 
       request2 = Request.put_new_header(request, "content-type", "text/html; charset=utf-8")
 
       assert request2.headers == [
                {"accept", "application/json"},
                {"content-type", "text/html; charset=utf-8"}
+             ]
+    end
+
+    test "put_new_lazy_header/3 with fun/0", %{request: request} do
+      request1 = Request.put_new_lazy_header(request, "accept", fn -> "text/html" end)
+      assert request1.headers == [{"accept", "application/json"}]
+
+      request2 =
+        Request.put_new_lazy_header(request, "content-type", fn -> "text/html; charset=utf-8" end)
+
+      assert request2.headers == [
+               {"accept", "application/json"},
+               {"content-type", "text/html; charset=utf-8"}
+             ]
+    end
+
+    test "put_new_lazy_header/3 with fun/1", %{request: request} do
+      request1 = Request.put_new_lazy_header(request, "accept", fn _request -> "text/html" end)
+      assert request1.headers == [{"accept", "application/json"}]
+
+      request2 =
+        Request.put_new_lazy_header(request, "x-scheme", fn request ->
+          to_string(request.scheme)
+        end)
+
+      assert request2.headers == [
+               {"accept", "application/json"},
+               {"x-scheme", "https"}
              ]
     end
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- add `HTTPSpec.Request.put_query/2`
+- add `HTTPSpec.Request.put_new_header/3`
+- add `HTTPSpec.Request.put_new_lazy_header/3`
+- add `HTTPSpec.Request.put_body/2`
+- add `HTTPSpec.Request.Query`
+
 ## 2.0.0
 
 ### Breaking changes
