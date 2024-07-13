@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.1.0
 
 - add `HTTPSpec.Request.put_query/2`
 - add `HTTPSpec.Request.put_new_header/3`
