@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- add `HTTPSpec.Request.URL`
+
 ## 2.1.0
 
 - add `HTTPSpec.Request.put_query/2`
