@@ -1,7 +1,7 @@
 defmodule HTTPSpec.MixProject do
   use Mix.Project
 
-  @version "2.1.0"
+  @version "2.2.0"
   @description "Provides implementation-independent HTTP-related structs."
   @source_url "https://github.com/cozy-elixir/http_spec"
   @changelog_url "https://github.com/cozy-elixir/http_spec/blob/v#{@version}/CHANGELOG.md"
