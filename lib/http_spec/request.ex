@@ -3,6 +3,8 @@ defmodule HTTPSpec.Request do
   A struct for describing HTTP request.
   """
 
+  alias HTTPSpec.Request.URL
+
   @enforce_keys [:method, :scheme, :host, :port, :path, :query, :fragment, :headers, :body]
   defstruct @enforce_keys
 
@@ -14,6 +16,8 @@ defmodule HTTPSpec.Request do
   @type fragment :: String.t() | nil
   @type headers :: [{header_name :: String.t(), header_value :: String.t()}]
   @type body :: iodata() | nil
+
+  @type url :: String.t()
 
   @type t :: %__MODULE__{
           method: method(),
@@ -27,44 +31,87 @@ defmodule HTTPSpec.Request do
           body: body()
         }
 
-  @definition NimbleOptions.new!(
-                method: [
-                  type: {:or, [:atom, :string]},
-                  required: true
-                ],
-                scheme: [
-                  type: {:in, [:http, :https]},
-                  required: true
-                ],
-                host: [
-                  type: :string,
-                  required: true
-                ],
-                port: [
-                  type: {:in, 0..65_535},
-                  required: true
-                ],
-                path: [
-                  type: {:or, [:string, nil]},
-                  default: nil
-                ],
-                query: [
-                  type: {:or, [:string, nil]},
-                  default: nil
-                ],
-                fragment: [
-                  type: {:or, [:string, nil]},
-                  default: nil
-                ],
-                headers: [
-                  type: {:list, {:tuple, [:string, :string]}},
-                  default: []
-                ],
-                body: [
-                  type: {:or, [{:list, :any}, :string, nil]},
-                  default: nil
-                ]
-              )
+  @definition_default_mode NimbleOptions.new!(
+                             method: [
+                               type: {:or, [:atom, :string]},
+                               required: true
+                             ],
+                             scheme: [
+                               type: {:in, [:http, :https]},
+                               required: true
+                             ],
+                             host: [
+                               type: :string,
+                               required: true
+                             ],
+                             port: [
+                               type: {:in, 0..65_535},
+                               required: true
+                             ],
+                             path: [
+                               type: {:or, [:string, nil]},
+                               default: nil
+                             ],
+                             query: [
+                               type: {:or, [:string, nil]},
+                               default: nil
+                             ],
+                             fragment: [
+                               type: {:or, [:string, nil]},
+                               default: nil
+                             ],
+                             headers: [
+                               type: {:list, {:tuple, [:string, :string]}},
+                               default: []
+                             ],
+                             body: [
+                               type: {:or, [{:list, :any}, :string, nil]},
+                               default: nil
+                             ]
+                           )
+
+  @definition_url_mode NimbleOptions.new!(
+                         url: [
+                           type: {:custom, URL, :type, []},
+                           required: true
+                         ],
+                         method: [
+                           type: {:or, [:atom, :string]},
+                           required: true
+                         ],
+                         scheme: [
+                           type: {:in, [:http, :https, nil]},
+                           default: nil
+                         ],
+                         host: [
+                           type: {:or, [:string, nil]},
+                           default: nil
+                         ],
+                         port: [
+                           type: {:or, [{:in, 0..65_535}, nil]},
+                           default: nil
+                         ],
+                         path: [
+                           type: {:or, [:string, nil]},
+                           default: nil
+                         ],
+                         query: [
+                           type: {:or, [:string, nil]},
+                           default: nil
+                         ],
+                         fragment: [
+                           type: {:or, [:string, nil]},
+                           default: nil
+                         ],
+                         headers: [
+                           type: {:list, {:tuple, [:string, :string]}},
+                           default: []
+                         ],
+                         body: [
+                           type: {:or, [{:list, :any}, :string, nil]},
+                           default: nil
+                         ]
+                       )
 
   @doc """
   Creates a request from given options.
@@ -87,17 +134,33 @@ defmodule HTTPSpec.Request do
         query: "tone=cute"
       })
 
+  And, an `url` option is provided for setting `scheme`, `host`, `port`, `path`
+  and `query` in a quick way.
+
+      HTTPSpec.Request.new(%{
+        method: :post,
+        url: "https://www.example.com/talk?tone=cute",
+        headers: [
+          {"content-type", "application/x-www-form-urlencoded"},
+          {"accept", "text/html"}
+        ],
+        body: "say=Hi&to=Mom"
+      })
+
   """
   @spec new(keyword() | map()) :: {:ok, t()} | {:error, HTTPSpec.ArgumentError.t()}
   def new(options) when is_list(options) or is_map(options) do
-    case NimbleOptions.validate(options, @definition) do
-      {:ok, validated_options} ->
+    default_mode? = !has_option?(options, :url)
+    definition = if default_mode?, do: @definition_default_mode, else: @definition_url_mode
+
+    case NimbleOptions.validate(options, definition) do
+      {:ok, attrs} ->
+        attrs = to_map(attrs)
+
         struct =
-          validated_options
-          |> update_in([:headers], fn headers ->
-            for({name, value} <- headers, do: {ensure_header_downcase(name), value})
-          end)
-          |> then(&struct(__MODULE__, &1))
+          if default_mode?,
+            do: build_request_for_default_mode(attrs),
+            else: build_request_for_url_mode(attrs)
 
         {:ok, struct}
 
@@ -110,6 +173,44 @@ defmodule HTTPSpec.Request do
            keys_path: error.keys_path
          }}
     end
+  end
+
+  defp has_option?(options, name) when is_list(options), do: Keyword.has_key?(options, name)
+  defp has_option?(options, name) when is_map(options), do: Map.has_key?(options, name)
+
+  defp build_request_for_default_mode(attrs) do
+    attrs
+    |> update_in([:headers], fn headers ->
+      for({name, value} <- headers, do: {ensure_header_downcase(name), value})
+    end)
+    |> then(&struct(__MODULE__, &1))
+  end
+
+  defp build_request_for_url_mode(attrs) do
+    %{
+      scheme: scheme,
+      host: host,
+      port: port,
+      path: path,
+      query: query,
+      fragment: fragment
+    } = URL.parse(attrs.url)
+
+    %{
+      method: attrs.method,
+      scheme: attrs.scheme || scheme,
+      host: attrs.host || host,
+      port: attrs.port || port,
+      path: attrs.path || path,
+      query: attrs.query || query,
+      fragment: attrs.fragment || fragment,
+      headers: attrs.headers,
+      body: attrs.body
+    }
+    |> update_in([:headers], fn headers ->
+      for({name, value} <- headers, do: {ensure_header_downcase(name), value})
+    end)
+    |> then(&struct(__MODULE__, &1))
   end
 
   @doc """
@@ -310,4 +411,7 @@ defmodule HTTPSpec.Request do
   defp ensure_header_downcase(name) do
     String.downcase(name, :ascii)
   end
+
+  defp to_map(term) when not is_map(term), do: Map.new(term)
+  defp to_map(map), do: map
 end

@@ -12,9 +12,10 @@ defmodule HTTPSpec.RequestTest do
                 port: 443,
                 method: "POST",
                 path: "/",
+                query: "key=value",
+                fragment: "tail",
                 headers: [{"accept", "*/*"}],
-                body: "",
-                query: "key=value"
+                body: ""
               }} =
                Request.new(
                  scheme: :https,
@@ -22,32 +23,11 @@ defmodule HTTPSpec.RequestTest do
                  port: 443,
                  method: "POST",
                  path: "/",
+                 query: "key=value",
+                 fragment: "tail",
                  headers: [{"Accept", "*/*"}],
-                 body: "",
-                 query: "key=value"
+                 body: ""
                )
-
-      assert {:ok,
-              %Request{
-                scheme: :https,
-                host: "www.example.com",
-                port: 443,
-                method: "POST",
-                path: "/",
-                headers: [{"accept", "*/*"}],
-                body: "",
-                query: "key=value"
-              }} =
-               Request.new(%{
-                 scheme: :https,
-                 host: "www.example.com",
-                 port: 443,
-                 method: "POST",
-                 path: "/",
-                 headers: [{"Accept", "*/*"}],
-                 body: "",
-                 query: "key=value"
-               })
     end
 
     test "returns {:error, exception} when options are invalid" do
@@ -61,6 +41,74 @@ defmodule HTTPSpec.RequestTest do
     end
   end
 
+  describe "new/1 (url mode)" do
+    test "returns {:ok, struct} when options are valid" do
+      assert {:ok,
+              %Request{
+                scheme: :https,
+                host: "www.example.com",
+                port: 443,
+                method: "POST",
+                path: "/",
+                query: "key=value",
+                fragment: "tail",
+                headers: [{"accept", "*/*"}],
+                body: ""
+              }} =
+               Request.new(
+                 method: "POST",
+                 url: "https://www.example.com/?key=value#tail",
+                 headers: [{"Accept", "*/*"}],
+                 body: ""
+               )
+    end
+
+    test "allows overriding the value parsed from url" do
+      assert {:ok,
+              %Request{
+                method: "POST",
+                scheme: :http,
+                host: "example.com",
+                port: 80,
+                path: "/hello",
+                query: "k=v",
+                fragment: "tailor",
+                headers: [{"accept", "*/*"}],
+                body: ""
+              }} =
+               Request.new(
+                 method: "POST",
+                 url: "https://www.example.com/?key=value#tail",
+                 headers: [{"Accept", "*/*"}],
+                 body: "",
+                 # overrides
+                 scheme: :http,
+                 host: "example.com",
+                 port: 80,
+                 path: "/hello",
+                 query: "k=v",
+                 fragment: "tailor"
+               )
+    end
+
+    test "returns error when url is invalid" do
+      assert {:error,
+              %HTTPSpec.ArgumentError{
+                message:
+                  "invalid value for :url option: only http:// or https:// address is supported",
+                key: :url,
+                value: "ftp://www.example.com/?key=value#tail",
+                keys_path: []
+              }} =
+               Request.new(
+                 method: "POST",
+                 url: "ftp://www.example.com/?key=value#tail",
+                 headers: [{"Accept", "*/*"}],
+                 body: ""
+               )
+    end
+  end
+
   describe "new!/1" do
     test "returns a struct when options are valid" do
       assert %Request{
@@ -69,9 +117,10 @@ defmodule HTTPSpec.RequestTest do
                port: 443,
                method: "POST",
                path: "/",
+               query: "key=value",
+               fragment: "tail",
                headers: [{"accept", "*/*"}],
-               body: "",
-               query: "key=value"
+               body: ""
              } =
                Request.new!(
                  scheme: :https,
@@ -79,9 +128,10 @@ defmodule HTTPSpec.RequestTest do
                  port: 443,
                  method: "POST",
                  path: "/",
+                 query: "key=value",
+                 fragment: "tail",
                  headers: [{"Accept", "*/*"}],
-                 body: "",
-                 query: "key=value"
+                 body: ""
                )
     end
 

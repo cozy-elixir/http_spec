@@ -46,4 +46,17 @@ defmodule HTTPSpec.Request.URL do
       fragment: fragment
     }
   end
+
+  # used as custom type of nimble_options
+  @doc false
+  def type(value) do
+    try do
+      parse(value)
+    rescue
+      error in [RuntimeError] ->
+        {:error, error.message}
+    else
+      _ -> {:ok, value}
+    end
+  end
 end

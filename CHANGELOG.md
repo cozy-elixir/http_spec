@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.0
+
+- add `:url` option for `HTTPSpec.Request.new/1` and `HTTPSpec.Request.new!/1`
+
 ## 2.2.0
 
 - add `HTTPSpec.Request.URL`
