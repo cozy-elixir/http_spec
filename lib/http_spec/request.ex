@@ -187,23 +187,16 @@ defmodule HTTPSpec.Request do
   end
 
   defp build_request_for_url_mode(attrs) do
-    %{
-      scheme: scheme,
-      host: host,
-      port: port,
-      path: path,
-      query: query,
-      fragment: fragment
-    } = URL.parse(attrs.url)
+    url = attrs.url
 
     %{
       method: attrs.method,
-      scheme: attrs.scheme || scheme,
-      host: attrs.host || host,
-      port: attrs.port || port,
-      path: attrs.path || path,
-      query: attrs.query || query,
-      fragment: attrs.fragment || fragment,
+      scheme: attrs.scheme || url.scheme,
+      host: attrs.host || url.host,
+      port: attrs.port || url.port,
+      path: attrs.path || url.path,
+      query: attrs.query || url.query,
+      fragment: attrs.fragment || url.fragment,
       headers: attrs.headers,
       body: attrs.body
     }

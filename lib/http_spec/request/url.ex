@@ -51,12 +51,10 @@ defmodule HTTPSpec.Request.URL do
   @doc false
   def type(value) do
     try do
-      parse(value)
+      {:ok, parse(value)}
     rescue
       error in [RuntimeError] ->
         {:error, error.message}
-    else
-      _ -> {:ok, value}
     end
   end
 end
