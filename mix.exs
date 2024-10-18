@@ -55,7 +55,7 @@ defmodule HTTPSpec.MixProject do
       Request: [
         HTTPSpec.Request,
         HTTPSpec.Request.URL,
-        HTTPSpec.Request.Query
+        HTTPSpec.Request.QueryParams
       ],
       Response: [
         HTTPSpec.Response

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- rename to `HTTPSpec.Request.Query` to `HTTPSpec.Request.QueryParams`.
+- change default encoding of of `HTTPSpec.Request.QueryParams` to `:rfc3986`.
+
 ## 2.3.0
 
 - add `:url` option for `HTTPSpec.Request.new/1` and `HTTPSpec.Request.new!/1`

@@ -1,6 +1,10 @@
-defmodule HTTPSpec.Request.Query do
+defmodule HTTPSpec.Request.QueryParams do
   @moduledoc """
-  Helpers to handle key-value pairs in query.
+  Helpers to handle key-value pairs which are encoded as query.
+
+  > #### Note {: .info}
+  > This module doesn't support Key-value pairs that contains duplicate keys,
+  > because the underlying data structure is a map.
 
   > Because query doesn't always contain key-value pairs, so related helpers
   > are grouped as this extra module.
@@ -14,7 +18,10 @@ defmodule HTTPSpec.Request.Query do
 
   @type name :: any()
   @type value :: any()
-  @type encoding :: :www_form | :rfc3986
+  @type encoding :: :rfc3986 | :www_form
+
+  @encodings [:rfc3986, :www_form]
+  @default_encoding :rfc3986
 
   @spec new(map()) :: t()
   def new(map \\ %{}) when is_map(map) do
@@ -23,21 +30,20 @@ defmodule HTTPSpec.Request.Query do
   end
 
   @spec encode(t(), encoding()) :: HTTPSpec.Request.query()
-  def encode(%__MODULE__{} = struct, encoding \\ :www_form)
-      when encoding in [:www_form, :rfc3986] do
+  def encode(%__MODULE__{} = struct, encoding \\ @default_encoding) when encoding in @encodings do
     query = URI.encode_query(struct.internal, encoding)
     if query == "", do: nil, else: query
   end
 
   @spec decode(HTTPSpec.Request.query(), encoding()) :: t()
-  def decode(query, encoding \\ :www_form)
+  def decode(query, encoding \\ @default_encoding)
 
-  def decode(nil, encoding) when encoding in [:www_form, :rfc3986] do
+  def decode(nil, encoding) when encoding in @encodings do
     internal = %{}
     %__MODULE__{internal: internal}
   end
 
-  def decode(query, encoding) when is_binary(query) and encoding in [:www_form, :rfc3986] do
+  def decode(query, encoding) when is_binary(query) and encoding in @encodings do
     map = URI.decode_query(query, %{}, encoding)
     new(map)
   end
