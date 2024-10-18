@@ -45,7 +45,25 @@ defmodule HTTPSpec.MixProject do
     [
       extras: ["README.md", "CHANGELOG.md"],
       source_url: @source_url,
-      source_ref: "v#{@version}"
+      source_ref: "v#{@version}",
+      groups_for_modules: groups_for_modules()
+    ]
+  end
+
+  defp groups_for_modules do
+    [
+      Request: [
+        HTTPSpec.Request,
+        HTTPSpec.Request.URL,
+        HTTPSpec.Request.Query
+      ],
+      Response: [
+        HTTPSpec.Response
+      ],
+      Share: [],
+      Exceptions: [
+        HTTPSpec.ArgumentError
+      ]
     ]
   end
 
