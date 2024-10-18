@@ -2,8 +2,10 @@
 
 ## Unreleased
 
-- rename to `HTTPSpec.Request.Query` to `HTTPSpec.Request.QueryParams`.
+- rename `HTTPSpec.Request.Query` to `HTTPSpec.Request.QueryParams`.
 - change default encoding of of `HTTPSpec.Request.QueryParams` to `:rfc3986`.
+- rename `HTTPSpec.Request.URL.parse/1` to `HTTPSpec.Request.URL.parse!/1`
+- add `HTTPSpec.Request.URL.parse/1` which returns ok/error tuple.
 
 ## 2.3.0
 
