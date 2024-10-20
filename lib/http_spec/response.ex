@@ -3,6 +3,9 @@ defmodule HTTPSpec.Response do
   A struct for describing HTTP response.
   """
 
+  alias HTTPSpec.Header
+  alias HTTPSpec.Trailer
+
   defstruct [
     :status,
     :body,
@@ -12,13 +15,12 @@ defmodule HTTPSpec.Response do
 
   @type status :: non_neg_integer()
   @type body :: binary() | nil
-  @type headers :: [{header_name :: String.t(), header_value :: String.t()}]
 
   @type t :: %__MODULE__{
           status: status(),
-          headers: headers(),
+          headers: Header.headers(),
           body: body(),
-          trailers: headers()
+          trailers: Trailer.trailers()
         }
 
   @definition NimbleOptions.new!(
@@ -64,7 +66,7 @@ defmodule HTTPSpec.Response do
         struct =
           validated_options
           |> update_in([:headers], fn headers ->
-            for({name, value} <- headers, do: {ensure_header_downcase(name), value})
+            for({name, value} <- headers, do: {Header.ensure_header_downcase(name), value})
           end)
           |> then(&struct(__MODULE__, &1))
 
@@ -93,28 +95,5 @@ defmodule HTTPSpec.Response do
       {:error, exception} when is_exception(exception) ->
         raise exception
     end
-  end
-
-  @doc """
-  Returns the values of the trailer specified by `name`.
-
-  ## Examples
-
-      iex> HTTPSpec.Response.get_trailer(response, "expires")
-      ["Wed, 21 Oct 2015 07:28:00 GMT"]
-
-      iex> HTTPSpec.Response.get_trailer(response, "x-unknown")
-      []
-
-  """
-  @spec get_trailer(t(), binary()) :: [binary()]
-  def get_trailer(%__MODULE__{} = response, name) when is_binary(name) do
-    for {^name, value} <- response.trailers do
-      value
-    end
-  end
-
-  defp ensure_header_downcase(name) do
-    String.downcase(name, :ascii)
   end
 end

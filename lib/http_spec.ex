@@ -37,5 +37,5 @@ defmodule HTTPSpec do
   Check out their docs for more available functionalities.
   """
 
-  @type fields :: {name :: String.t(), value :: String.t()}
+  @type field :: {name :: String.t(), value :: String.t()}
 end

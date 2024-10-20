@@ -67,33 +67,4 @@ defmodule HTTPSpec.ResponseTest do
       end
     end
   end
-
-  describe "operate on headers" do
-    setup do
-      response =
-        build_response(
-          headers: [{"content-type", "application/json"}, {"trailer", "expires"}],
-          trailers: [{"expires", "Wed, 21 Oct 2015 07:28:00 GMT"}]
-        )
-
-      %{response: response}
-    end
-
-    test "get_trailer/2", %{response: response} do
-      assert ["Wed, 21 Oct 2015 07:28:00 GMT"] = Response.get_trailer(response, "expires")
-      assert [] = Response.get_trailer(response, "x-unknown")
-    end
-  end
-
-  defp build_response(overrides) do
-    default = [
-      status: 200,
-      headers: [],
-      body: nil
-    ]
-
-    default
-    |> Keyword.merge(overrides)
-    |> Response.new!()
-  end
 end

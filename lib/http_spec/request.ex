@@ -5,8 +5,20 @@ defmodule HTTPSpec.Request do
 
   alias HTTPSpec.Request.URL
   alias HTTPSpec.Header
+  alias HTTPSpec.Trailer
 
-  @enforce_keys [:method, :scheme, :host, :port, :path, :query, :fragment, :headers, :body]
+  @enforce_keys [
+    :method,
+    :scheme,
+    :host,
+    :port,
+    :path,
+    :query,
+    :fragment,
+    :headers,
+    :body,
+    :trailers
+  ]
   defstruct @enforce_keys
 
   @type method :: atom() | String.t()
@@ -28,7 +40,8 @@ defmodule HTTPSpec.Request do
           query: query(),
           fragment: fragment(),
           headers: Header.headers(),
-          body: body()
+          body: body(),
+          trailers: Trailer.trailers()
         }
 
   @definition_default_mode NimbleOptions.new!(
@@ -67,6 +80,10 @@ defmodule HTTPSpec.Request do
                              body: [
                                type: {:or, [{:list, :any}, :string, nil]},
                                default: nil
+                             ],
+                             trailers: [
+                               type: {:list, {:tuple, [:string, :string]}},
+                               default: []
                              ]
                            )
 
@@ -110,6 +127,10 @@ defmodule HTTPSpec.Request do
                          body: [
                            type: {:or, [{:list, :any}, :string, nil]},
                            default: nil
+                         ],
+                         trailers: [
+                           type: {:list, {:tuple, [:string, :string]}},
+                           default: []
                          ]
                        )
 
