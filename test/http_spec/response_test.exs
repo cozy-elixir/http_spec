@@ -79,11 +79,6 @@ defmodule HTTPSpec.ResponseTest do
       %{response: response}
     end
 
-    test "get_header/2", %{response: response} do
-      assert ["application/json"] = Response.get_header(response, "content-type")
-      assert [] = Response.get_header(response, "x-unknown")
-    end
-
     test "get_trailer/2", %{response: response} do
       assert ["Wed, 21 Oct 2015 07:28:00 GMT"] = Response.get_trailer(response, "expires")
       assert [] = Response.get_trailer(response, "x-unknown")

@@ -4,6 +4,7 @@ defmodule HTTPSpec.Request do
   """
 
   alias HTTPSpec.Request.URL
+  alias HTTPSpec.Header
 
   @enforce_keys [:method, :scheme, :host, :port, :path, :query, :fragment, :headers, :body]
   defstruct @enforce_keys
@@ -14,7 +15,6 @@ defmodule HTTPSpec.Request do
   @type path :: String.t()
   @type query :: String.t() | nil
   @type fragment :: String.t() | nil
-  @type headers :: [{header_name :: String.t(), header_value :: String.t()}]
   @type body :: iodata() | nil
 
   @type url :: String.t()
@@ -27,7 +27,7 @@ defmodule HTTPSpec.Request do
           path: path(),
           query: query(),
           fragment: fragment(),
-          headers: headers(),
+          headers: Header.headers(),
           body: body()
         }
 
@@ -181,7 +181,7 @@ defmodule HTTPSpec.Request do
   defp build_request_for_default_mode(attrs) do
     attrs
     |> update_in([:headers], fn headers ->
-      for({name, value} <- headers, do: {ensure_header_downcase(name), value})
+      for({name, value} <- headers, do: {Header.ensure_header_downcase(name), value})
     end)
     |> then(&struct(__MODULE__, &1))
   end
@@ -201,7 +201,7 @@ defmodule HTTPSpec.Request do
       body: attrs.body
     }
     |> update_in([:headers], fn headers ->
-      for({name, value} <- headers, do: {ensure_header_downcase(name), value})
+      for({name, value} <- headers, do: {Header.ensure_header_downcase(name), value})
     end)
     |> then(&struct(__MODULE__, &1))
   end
@@ -221,116 +221,12 @@ defmodule HTTPSpec.Request do
   end
 
   @doc """
-  Returns the values of the header specified by `name`.
-
-  ## Examples
-
-      iex> HTTPSpec.Request.get_header(request, "accept")
-      ["application/json"]
-      iex> HTTPSpec.Request.get_header(requset, "x-unknown")
-      []
-
+  Puts query into request.
   """
-  @spec get_header(t(), binary()) :: [binary()]
-  def get_header(%__MODULE__{} = request, name) when is_binary(name) do
-    name = ensure_header_downcase(name)
-
-    for {^name, value} <- request.headers do
-      value
-    end
-  end
-
-  @doc """
-  Puts a request header `name` to `value`.
-
-  If the header was previously set, its value is overwritten.
-
-  ## Examples
-
-      iex> HTTPSpec.Request.get_header(request, "accept")
-      []
-      iex> request = Request.put_header(request, "accept", "application/json")
-      iex> HTTPSpec.Request.get_header(request, "accept")
-      ["application/json"]
-
-  """
-  @spec put_header(t(), binary(), binary()) :: t()
-  def put_header(%__MODULE__{} = request, name, value)
-      when is_binary(name) and is_binary(value) do
-    name = ensure_header_downcase(name)
-    %{request | headers: List.keystore(request.headers, name, 0, {name, value})}
-  end
-
-  @doc """
-  Puts a request header `name` to `value` unless already present.
-
-  See `put_header/3` for more information.
-
-  ## Examples
-
-      iex> request =
-      ...>   request
-      ...>   |> HTTPSpec.Request.put_new_header("accept", "application/json")
-      ...>   |> HTTPSpec.Request.put_new_header("accept", "text/html")
-      iex> HTTPSpec.Request.get_header(request, "accept")
-      ["application/json"]
-
-  """
-  @spec put_new_header(t(), binary(), binary()) :: t()
-  def put_new_header(%__MODULE__{} = request, name, value)
-      when is_binary(name) and is_binary(value) do
-    case get_header(request, name) do
-      [] -> put_header(request, name, value)
-      _ -> request
-    end
-  end
-
-  @doc """
-  Lazy version of `put_new_header/3`.
-  """
-  @spec put_new_lazy_header(t(), binary(), (-> binary()) | (t() -> binary())) :: t()
-  def put_new_lazy_header(%__MODULE__{} = request, name, fun)
-      when is_binary(name) and is_function(fun, 0) do
-    case get_header(request, name) do
-      [] ->
-        value = apply(fun, [])
-        put_header(request, name, value)
-
-      _ ->
-        request
-    end
-  end
-
-  def put_new_lazy_header(%__MODULE__{} = request, name, fun)
-      when is_binary(name) and is_function(fun, 1) do
-    case get_header(request, name) do
-      [] ->
-        value = apply(fun, [request])
-        put_header(request, name, value)
-
-      _ ->
-        request
-    end
-  end
-
-  @doc """
-  Deletes the header given by `name`.
-
-  All occurrences of the header are deleted, in case the header is repeated multiple times.
-
-  ## Examples
-
-      iex> HTTPSpec.Request.get_header(request, "cache-control")
-      ["max-age=600", "no-transform"]
-      iex> request = Request.delete_header(req, "cache-control")
-      iex> HTTPSpec.Request.get_header(request, "cache-control")
-      []
-
-  """
-  @spec delete_header(t(), binary()) :: t()
-  def delete_header(%__MODULE__{} = request, name) when is_binary(name) do
-    name = ensure_header_downcase(name)
-    %{request | headers: List.keydelete(request.headers, name, 0)}
+  @spec put_query(t(), query()) :: t()
+  def put_query(%__MODULE__{} = request, query)
+      when is_binary(query) or is_nil(query) do
+    %{request | query: query}
   end
 
   @doc """
@@ -340,15 +236,6 @@ defmodule HTTPSpec.Request do
   def put_body(%__MODULE__{} = request, body)
       when is_list(body) or is_binary(body) or is_nil(body) do
     %{request | body: body}
-  end
-
-  @doc """
-  Puts query into request.
-  """
-  @spec put_query(t(), query()) :: t()
-  def put_query(%__MODULE__{} = request, query)
-      when is_binary(query) or is_nil(query) do
-    %{request | query: query}
   end
 
   @doc """
@@ -399,10 +286,6 @@ defmodule HTTPSpec.Request do
       fragment: request.fragment
     }
     |> URI.to_string()
-  end
-
-  defp ensure_header_downcase(name) do
-    String.downcase(name, :ascii)
   end
 
   defp to_map(term) when not is_map(term), do: Map.new(term)

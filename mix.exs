@@ -60,9 +60,13 @@ defmodule HTTPSpec.MixProject do
       Response: [
         HTTPSpec.Response
       ],
-      Share: [],
+      Fields: [
+        HTTPSpec.Header,
+        HTTPSpec.Trailer
+      ],
       Exceptions: [
-        HTTPSpec.ArgumentError
+        HTTPSpec.ArgumentError,
+        HTTPSpec.Request.URL.ParseError
       ]
     ]
   end

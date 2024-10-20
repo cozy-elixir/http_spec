@@ -6,6 +6,7 @@
 - change default encoding of of `HTTPSpec.Request.QueryParams` to `:rfc3986`.
 - rename `HTTPSpec.Request.URL.parse/1` to `HTTPSpec.Request.URL.parse!/1`
 - add `HTTPSpec.Request.URL.parse/1` which returns ok/error tuple.
+- move all header related function to a new module `HTTPSpec.Header`
 
 ## 2.3.0
 

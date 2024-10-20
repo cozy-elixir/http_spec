@@ -96,25 +96,6 @@ defmodule HTTPSpec.Response do
   end
 
   @doc """
-  Returns the values of the header specified by `name`.
-
-  ## Examples
-
-      iex> HTTPSpec.Response.get_header(response, "content-type")
-      ["application/json"]
-
-      iex> HTTPSpec.Response.get_header(response, "x-unknown")
-      []
-
-  """
-  @spec get_header(t(), binary()) :: [binary()]
-  def get_header(%__MODULE__{} = response, name) when is_binary(name) do
-    for {^name, value} <- response.headers do
-      value
-    end
-  end
-
-  @doc """
   Returns the values of the trailer specified by `name`.
 
   ## Examples
