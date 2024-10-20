@@ -3,8 +3,7 @@ defmodule HTTPSpec.Header do
   Helpers for handling headers.
   """
 
-  alias HTTPSpec.Request
-  alias HTTPSpec.Response
+  import HTTPSpec.Guards
 
   @type headers :: [HTTPSpec.field()]
 
@@ -20,9 +19,7 @@ defmodule HTTPSpec.Header do
 
   """
   @spec get_header(HTTPSpec.message(), binary()) :: [binary()]
-  def get_header(message, name)
-      when (is_struct(message, Request) or is_struct(message, Response)) and
-             is_binary(name) do
+  def get_header(message, name) when is_message(message) and is_binary(name) do
     name = ensure_downcased_name(name)
 
     for {^name, value} <- message.headers do
@@ -46,7 +43,7 @@ defmodule HTTPSpec.Header do
   """
   @spec put_header(HTTPSpec.message(), binary(), binary()) :: HTTPSpec.message()
   def put_header(message, name, value)
-      when (is_struct(message, Request) or is_struct(message, Response)) and
+      when is_message(message) and
              is_binary(name) and
              is_binary(value) do
     name = ensure_downcased_name(name)
@@ -70,7 +67,7 @@ defmodule HTTPSpec.Header do
   """
   @spec put_new_header(HTTPSpec.message(), binary(), binary()) :: HTTPSpec.message()
   def put_new_header(message, name, value)
-      when (is_struct(message, Request) or is_struct(message, Response)) and
+      when is_message(message) and
              is_binary(name) and
              is_binary(value) do
     case get_header(message, name) do
@@ -89,7 +86,7 @@ defmodule HTTPSpec.Header do
         ) ::
           HTTPSpec.message()
   def put_new_lazy_header(message, name, fun)
-      when (is_struct(message, Request) or is_struct(message, Response)) and
+      when is_message(message) and
              is_binary(name) and
              is_function(fun, 0) do
     case get_header(message, name) do
@@ -103,7 +100,7 @@ defmodule HTTPSpec.Header do
   end
 
   def put_new_lazy_header(message, name, fun)
-      when (is_struct(message, Request) or is_struct(message, Response)) and
+      when is_message(message) and
              is_binary(name) and
              is_function(fun, 1) do
     case get_header(message, name) do
@@ -131,9 +128,7 @@ defmodule HTTPSpec.Header do
 
   """
   @spec delete_header(HTTPSpec.message(), binary()) :: HTTPSpec.message()
-  def delete_header(message, name)
-      when (is_struct(message, Request) or is_struct(message, Response)) and
-             is_binary(name) do
+  def delete_header(message, name) when is_message(message) and is_binary(name) do
     name = ensure_downcased_name(name)
     %{message | headers: List.keydelete(message.headers, name, 0)}
   end
