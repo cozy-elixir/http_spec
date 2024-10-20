@@ -23,7 +23,7 @@ defmodule HTTPSpec.Header do
   def get_header(message, name)
       when (is_struct(message, Request) or is_struct(message, Response)) and
              is_binary(name) do
-    name = ensure_header_downcase(name)
+    name = ensure_downcased_name(name)
 
     for {^name, value} <- message.headers do
       value
@@ -49,7 +49,7 @@ defmodule HTTPSpec.Header do
       when (is_struct(message, Request) or is_struct(message, Response)) and
              is_binary(name) and
              is_binary(value) do
-    name = ensure_header_downcase(name)
+    name = ensure_downcased_name(name)
     %{message | headers: List.keystore(message.headers, name, 0, {name, value})}
   end
 
@@ -134,12 +134,12 @@ defmodule HTTPSpec.Header do
   def delete_header(message, name)
       when (is_struct(message, Request) or is_struct(message, Response)) and
              is_binary(name) do
-    name = ensure_header_downcase(name)
+    name = ensure_downcased_name(name)
     %{message | headers: List.keydelete(message.headers, name, 0)}
   end
 
   @doc false
-  def ensure_header_downcase(name) do
+  def ensure_downcased_name(name) do
     String.downcase(name, :ascii)
   end
 end

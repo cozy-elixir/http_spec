@@ -202,7 +202,7 @@ defmodule HTTPSpec.Request do
   defp build_request_for_default_mode(attrs) do
     attrs
     |> update_in([:headers], fn headers ->
-      for({name, value} <- headers, do: {Header.ensure_header_downcase(name), value})
+      for({name, value} <- headers, do: {Header.ensure_downcased_name(name), value})
     end)
     |> then(&struct(__MODULE__, &1))
   end
@@ -222,7 +222,7 @@ defmodule HTTPSpec.Request do
       body: attrs.body
     }
     |> update_in([:headers], fn headers ->
-      for({name, value} <- headers, do: {Header.ensure_header_downcase(name), value})
+      for({name, value} <- headers, do: {Header.ensure_downcased_name(name), value})
     end)
     |> then(&struct(__MODULE__, &1))
   end

@@ -66,7 +66,7 @@ defmodule HTTPSpec.Response do
         struct =
           validated_options
           |> update_in([:headers], fn headers ->
-            for({name, value} <- headers, do: {Header.ensure_header_downcase(name), value})
+            for({name, value} <- headers, do: {Header.ensure_downcased_name(name), value})
           end)
           |> then(&struct(__MODULE__, &1))
 
