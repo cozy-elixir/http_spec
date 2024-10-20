@@ -1,20 +1,21 @@
 defmodule HTTPSpec.Response do
   @moduledoc """
-  A struct for describing HTTP response.
+  A struct for describing HTTP responses.
   """
 
   alias HTTPSpec.Header
   alias HTTPSpec.Trailer
 
-  defstruct [
+  @enforce_keys [
     :status,
     :body,
-    headers: [],
-    trailers: []
+    :headers,
+    :trailers
   ]
+  defstruct @enforce_keys
 
   @type status :: non_neg_integer()
-  @type body :: binary() | nil
+  @type body :: iodata() | nil
 
   @type t :: %__MODULE__{
           status: status(),
@@ -58,8 +59,7 @@ defmodule HTTPSpec.Response do
       })
 
   """
-  @spec new(keyword() | map()) ::
-          {:ok, __MODULE__.t()} | {:error, HTTPSpec.ArgumentError.t()}
+  @spec new(keyword() | map()) :: {:ok, t()} | {:error, HTTPSpec.ArgumentError.t()}
   def new(options) when is_list(options) or is_map(options) do
     case NimbleOptions.validate(options, @definition) do
       {:ok, validated_options} ->
@@ -86,7 +86,7 @@ defmodule HTTPSpec.Response do
   @doc """
   Bang version of `new/1`.
   """
-  @spec new!(keyword() | map()) :: __MODULE__.t()
+  @spec new!(keyword() | map()) :: t()
   def new!(options) when is_list(options) or is_map(options) do
     case new(options) do
       {:ok, struct} ->

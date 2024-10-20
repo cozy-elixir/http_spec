@@ -1,11 +1,10 @@
 defmodule HTTPSpec.Trailer do
   @moduledoc """
-  Helpers to handle trailers.
+  Helpers for handling trailers.
+
+  > #### Note {: .info}
+  > Currently, I don't have this requirement. PRs are welcome.
   """
 
-  alias HTTPSpec.Request
-  alias HTTPSpec.Response
-
   @type trailers :: [HTTPSpec.field()]
-  @type msg :: Request.t() | Response.t()
 end

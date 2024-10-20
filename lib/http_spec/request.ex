@@ -1,6 +1,6 @@
 defmodule HTTPSpec.Request do
   @moduledoc """
-  A struct for describing HTTP request.
+  A struct for describing HTTP requests.
   """
 
   alias HTTPSpec.Request.URL
@@ -15,8 +15,8 @@ defmodule HTTPSpec.Request do
     :path,
     :query,
     :fragment,
-    :headers,
     :body,
+    :headers,
     :trailers
   ]
   defstruct @enforce_keys

@@ -37,5 +37,9 @@ defmodule HTTPSpec do
   Check out their docs for more available functionalities.
   """
 
+  alias HTTPSpec.Request
+  alias HTTPSpec.Response
+
+  @type message :: Request.t() | Response.t()
   @type field :: {name :: String.t(), value :: String.t()}
 end

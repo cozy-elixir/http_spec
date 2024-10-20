@@ -1,13 +1,12 @@
 defmodule HTTPSpec.Header do
   @moduledoc """
-  Helpers to handle headers.
+  Helpers for handling headers.
   """
 
   alias HTTPSpec.Request
   alias HTTPSpec.Response
 
   @type headers :: [HTTPSpec.field()]
-  @type msg :: Request.t() | Response.t()
 
   @doc """
   Returns the values of the header specified by `name`.
@@ -20,13 +19,13 @@ defmodule HTTPSpec.Header do
       []
 
   """
-  @spec get_header(msg(), binary()) :: [binary()]
-  def get_header(msg, name)
-      when (is_struct(msg, Request) or is_struct(msg, Response)) and
+  @spec get_header(HTTPSpec.message(), binary()) :: [binary()]
+  def get_header(message, name)
+      when (is_struct(message, Request) or is_struct(message, Response)) and
              is_binary(name) do
     name = ensure_header_downcase(name)
 
-    for {^name, value} <- msg.headers do
+    for {^name, value} <- message.headers do
       value
     end
   end
@@ -45,13 +44,13 @@ defmodule HTTPSpec.Header do
       ["application/json"]
 
   """
-  @spec put_header(msg(), binary(), binary()) :: msg()
-  def put_header(msg, name, value)
-      when (is_struct(msg, Request) or is_struct(msg, Response)) and
+  @spec put_header(HTTPSpec.message(), binary(), binary()) :: HTTPSpec.message()
+  def put_header(message, name, value)
+      when (is_struct(message, Request) or is_struct(message, Response)) and
              is_binary(name) and
              is_binary(value) do
     name = ensure_header_downcase(name)
-    %{msg | headers: List.keystore(msg.headers, name, 0, {name, value})}
+    %{message | headers: List.keystore(message.headers, name, 0, {name, value})}
   end
 
   @doc """
@@ -69,46 +68,51 @@ defmodule HTTPSpec.Header do
       ["application/json"]
 
   """
-  @spec put_new_header(msg(), binary(), binary()) :: msg()
-  def put_new_header(msg, name, value)
-      when (is_struct(msg, Request) or is_struct(msg, Response)) and
+  @spec put_new_header(HTTPSpec.message(), binary(), binary()) :: HTTPSpec.message()
+  def put_new_header(message, name, value)
+      when (is_struct(message, Request) or is_struct(message, Response)) and
              is_binary(name) and
              is_binary(value) do
-    case get_header(msg, name) do
-      [] -> put_header(msg, name, value)
-      _ -> msg
+    case get_header(message, name) do
+      [] -> put_header(message, name, value)
+      _ -> message
     end
   end
 
   @doc """
   Lazy version of `put_new_header/3`.
   """
-  @spec put_new_lazy_header(msg(), binary(), (-> binary()) | (msg() -> binary())) :: msg()
-  def put_new_lazy_header(msg, name, fun)
-      when (is_struct(msg, Request) or is_struct(msg, Response)) and
+  @spec put_new_lazy_header(
+          HTTPSpec.message(),
+          binary(),
+          (-> binary()) | (HTTPSpec.message() -> binary())
+        ) ::
+          HTTPSpec.message()
+  def put_new_lazy_header(message, name, fun)
+      when (is_struct(message, Request) or is_struct(message, Response)) and
              is_binary(name) and
              is_function(fun, 0) do
-    case get_header(msg, name) do
+    case get_header(message, name) do
       [] ->
         value = apply(fun, [])
-        put_header(msg, name, value)
+        put_header(message, name, value)
 
       _ ->
-        msg
+        message
     end
   end
 
-  def put_new_lazy_header(msg, name, fun)
-      when (is_struct(msg, Request) or is_struct(msg, Response)) and
+  def put_new_lazy_header(message, name, fun)
+      when (is_struct(message, Request) or is_struct(message, Response)) and
              is_binary(name) and
              is_function(fun, 1) do
-    case get_header(msg, name) do
+    case get_header(message, name) do
       [] ->
-        value = apply(fun, [msg])
-        put_header(msg, name, value)
+        value = apply(fun, [message])
+        put_header(message, name, value)
 
       _ ->
-        msg
+        message
     end
   end
 
@@ -126,12 +130,12 @@ defmodule HTTPSpec.Header do
       []
 
   """
-  @spec delete_header(msg(), binary()) :: msg()
-  def delete_header(msg, name)
-      when (is_struct(msg, Request) or is_struct(msg, Response)) and
+  @spec delete_header(HTTPSpec.message(), binary()) :: HTTPSpec.message()
+  def delete_header(message, name)
+      when (is_struct(message, Request) or is_struct(message, Response)) and
              is_binary(name) do
     name = ensure_header_downcase(name)
-    %{msg | headers: List.keydelete(msg.headers, name, 0)}
+    %{message | headers: List.keydelete(message.headers, name, 0)}
   end
 
   @doc false

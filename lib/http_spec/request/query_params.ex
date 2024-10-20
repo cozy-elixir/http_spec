@@ -1,6 +1,6 @@
 defmodule HTTPSpec.Request.QueryParams do
   @moduledoc """
-  Helpers to handle key-value pairs which are encoded as query.
+  Helpers for handling key-value pairs which are encoded as query.
 
   > #### Note {: .info}
   > This module doesn't support Key-value pairs that contains duplicate keys,

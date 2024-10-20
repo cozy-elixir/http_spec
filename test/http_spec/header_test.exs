@@ -134,7 +134,9 @@ defmodule HTTPSpec.HeaderTest do
     end
 
     test "put_new_lazy_header/3 with fun/1", %{response: response} do
-      response1 = Header.put_new_lazy_header(response, "content-type", fn _response -> "text/html" end)
+      response1 =
+        Header.put_new_lazy_header(response, "content-type", fn _response -> "text/html" end)
+
       assert response1.headers == [{"content-type", "application/json"}]
 
       response2 =

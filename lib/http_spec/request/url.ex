@@ -1,6 +1,6 @@
 defmodule HTTPSpec.Request.URL do
   @moduledoc """
-  Helpers to handle URL.
+  Helpers for handling URL.
   """
 
   defmodule ParseError do
@@ -41,7 +41,7 @@ defmodule HTTPSpec.Request.URL do
        }}
 
   """
-  @spec parse(String.t()) :: {:ok, t()} | :error
+  @spec parse(String.t()) :: {:ok, t()} | {:error, ParseError.t()}
   def parse("http://" <> _ = url), do: do_parse(url)
   def parse("https://" <> _ = url), do: do_parse(url)
 
@@ -51,7 +51,7 @@ defmodule HTTPSpec.Request.URL do
   @doc """
   Bang version of `parse/1`.
   """
-  @spec parse!(String.t()) :: {:ok, t()} | {:error, ParseError.t()}
+  @spec parse!(String.t()) :: t()
   def parse!(url) do
     case parse(url) do
       {:ok, t} -> t
